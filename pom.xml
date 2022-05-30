@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.uni.se</groupId>
+	<artifactId>SQL2MSFOL</artifactId>
+	<version>1.0.0</version>
+
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.sosy-lab/java-smt <dependency> 
+			<groupId>org.sosy-lab</groupId> <artifactId>java-smt</artifactId> <version>3.6.0</version> 
+			</dependency> -->
+		<!-- https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser -->
+		<dependency>
+			<groupId>com.github.jsqlparser</groupId>
+			<artifactId>jsqlparser</artifactId>
+			<version>4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>datamodel</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>sql2msfol</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<argument>-Xmx1G</argument>
+								<argument>-classpath</argument>
+								<!-- automatically creates the classpath using all project dependencies, 
+									also adding the project build directory -->
+								<classpath />
+								<argument>configurations.Runner</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

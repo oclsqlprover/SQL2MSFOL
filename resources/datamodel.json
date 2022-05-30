@@ -1,0 +1,54 @@
+[
+	{
+		"class": "Lecturer",
+		"attributes": [
+			{
+				"name": "name",
+				"type": "String"
+			},
+			{
+				"name": "email",
+				"type": "String"
+			},
+			{
+				"name": "age",
+				"type": "Integer"
+			}
+		],
+		"ends": [
+			{
+				"association": "Enrolment",
+				"name": "students",
+				"target": "Student",
+				"opp": "lecturers",
+				"mult": "*"
+			}
+		]
+	},
+	{
+		"class": "Student",
+		"attributes": [
+			{
+				"name": "name",
+				"type": "String"
+			},
+			{
+				"name": "email",
+				"type": "String"
+			},
+			{
+				"name": "age",
+				"type": "Integer"
+			}
+		],
+		"ends": [
+			{
+				"association": "Enrolment",
+				"name": "lecturers",
+				"target": "Lecturer",
+				"opp": "students",
+				"mult": "*"
+			}
+		]
+	}
+]
