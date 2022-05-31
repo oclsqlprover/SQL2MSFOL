@@ -20,9 +20,9 @@ SELECT selectitems FROM fromitem JOIN fromitem ON onExpr WHERE whereExpr
 where
 ```
 selectitems := expr (, expr)*
-fromitem    := class 
-             | association-class 
-             | subselect
+fromitem    := class AS alias
+             | association-class AS alias
+             | subselect AS alias
 whereExpr   := boolexpr
 onExpr      := boolexpr
 ```
@@ -32,9 +32,9 @@ expr := TRUE | FALSE | NULL    (boolean literals)
       | ... | -1 | 0 | 1 | ... (integer literals)
       | var                    (variables)
       | 'a string'             (string literals)
-      | id                     (class-id)
-      | attribute              (class-attributes)
-      | association-end        (association-ends)
+      | alias.id               (class-id)
+      | alias.attribute        (class-attributes)
+      | alias.association-end  (association-ends)
       | NOT boolexpr           (unary operations)
       | boolexpr AND boolexpr  (binary operations, i.e., AND, OR)
       | expr = expr            (binary comparisons, i.e., =, <>, >, <, >=, <=)
