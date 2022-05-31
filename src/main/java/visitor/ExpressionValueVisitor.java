@@ -149,7 +149,7 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		// TODO: Type check of null?
 		ExpressionValue v = valueExpression(nullValue, true);
 		String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) %3$s))))";
-		definition = String.format(definition, parent.getFuncName(), v.getFuncName(), "NULL");
+		definition = String.format(definition, parent.getFuncName(), "%s", "NULL");
 		definitions.add(definition);
 		v.setMeanings(definitions);
 	}
@@ -184,7 +184,7 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		expr.accept(createVisitor());
 		ExpressionValue v = valueExpression(signedExpression, true);
 		String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) (* (-1) (%3$s x))))))";
-		definition = String.format(definition, parent.getFuncName(), v.getFuncName(),
+		definition = String.format(definition, parent.getFuncName(), "%s",
 				ValueMapping.getValue(signedExpression.getExpression()).getFuncName());
 		definitions.add(definition);
 		v.setMeanings(definitions);
@@ -216,7 +216,7 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		axiom = String.format(axiom, longValue.getValue());
 		axiom1 = String.format(axiom1, longValue.getValue());
 		String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) %3$s))))";
-		definition = String.format(definition, parent.getFuncName(), v.getFuncName(), longValue.getValue());
+		definition = String.format(definition, parent.getFuncName(), "%s", longValue.getValue());
 		definitions.add(definition);
 		definitions.add(axiom);
 		definitions.add(axiom1);
@@ -261,7 +261,7 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String axiom1 = "(assert (not (= %1$s invalString)))";
 		axiom = String.format(axiom, stringValue.toString());
 		axiom1 = String.format(axiom1, stringValue.toString());
-		definition = String.format(definition, parent.getFuncName(), v.getFuncName(), stringValue.toString());
+		definition = String.format(definition, parent.getFuncName(), "%s", stringValue.toString());
 		definitions.add(definition);
 		definitions.add(axiom);
 		definitions.add(axiom1);
@@ -308,11 +308,11 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (= (%3$s x) TRUE) (= (%4$s x) TRUE))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (or (= (%3$s x) FALSE) (= (%4$s x) FALSE))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (and (= (%3$s x) NULL) (= (%4$s x) TRUE)) (and (= (%3$s x) TRUE) (= (%4$s x) NULL)) (and (= (%3$s x) NULL) (= (%4$s x) NULL)))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
 		definitions.add(definition1);
 		definitions.add(definition2);
@@ -330,11 +330,11 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (or (= (%3$s x) TRUE) (= (%4$s x) TRUE))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (= (%3$s x) FALSE) (= (%4$s x) FALSE))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (and (= (%3$s x) NULL) (= (%4$s x) FALSE)) (and (= (%3$s x) FALSE) (= (%4$s x) NULL)) (and (= (%3$s x) NULL) (= (%4$s x) NULL)))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
 		definitions.add(definition1);
 		definitions.add(definition2);
@@ -364,13 +364,13 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (= (%3$s x) (%4$s x)))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (not (= (%3$s x) (%4$s x))))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (= (%3$s x) %5$s) (= (%4$s x) %6$s))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
 		definitions.add(definition1);
@@ -389,13 +389,13 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (> (%3$s x) (%4$s x)))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (not (> (%3$s x) (%4$s x))))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (= (%3$s x) %5$s) (= (%4$s x) %6$s))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
 		definitions.add(definition1);
@@ -414,13 +414,13 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (>= (%3$s x) (%4$s x)))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (not (>= (%3$s x) (%4$s x))))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (= (%3$s x) %5$s) (= (%4$s x) %6$s))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
 		definitions.add(definition1);
@@ -455,9 +455,9 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 			definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (not (= (%3$s x) %4$s))))))";
 			definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (= (%3$s x) %4$s)))))";
 		}
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(expr).getFuncName(), TypeUtils.nullOf(expr, source));
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(expr).getFuncName(), TypeUtils.nullOf(expr, source));
 		definitions.add(definition1);
 		definitions.add(definition2);
@@ -486,13 +486,13 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (< (%3$s x) (%4$s x)))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (not (< (%3$s x) (%4$s x))))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (= (%3$s x) %5$s) (= (%4$s x) %6$s))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
 		definitions.add(definition1);
@@ -511,13 +511,13 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (<= (%3$s x) (%4$s x)))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (not (<= (%3$s x) (%4$s x))))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (= (%3$s x) %5$s) (= (%4$s x) %6$s))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
 		definitions.add(definition1);
@@ -536,13 +536,13 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (not (= (%3$s x) (%4$s x))))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (not (= (%3$s x) %5$s)) (not (= (%4$s x) %6$s)) (= (%3$s x) (%4$s x)))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (= (%3$s x) %5$s) (= (%4$s x) %6$s))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName(),
 				TypeUtils.nullOf(left, source), TypeUtils.nullOf(right, source));
 		definitions.add(definition1);
@@ -557,11 +557,11 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		ExpressionValue v = valueExpression(tableColumn, true);
 		if ("TRUE".equals(tableColumn.getColumnName()) || "FALSE".equals(tableColumn.getColumnName())) {
 			String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) %3$s))))";
-			definition = String.format(definition, parent.getFuncName(), v.getFuncName(), columnName);
+			definition = String.format(definition, parent.getFuncName(), "%s", columnName);
 			definitions.add(definition);
 		} else if (DataModelUtils.isContextVariables(columnName)) {
 			String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) %3$s))))";
-			definition = String.format(definition, parent.getFuncName(), v.getFuncName(), columnName);
+			definition = String.format(definition, parent.getFuncName(), "%s", columnName);
 			definitions.add(definition);
 		} else {
 			// It must be the projection from Fromitem(s)
@@ -577,12 +577,12 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 			Attribute at = DataModelUtils.getAttribute(e, columnName);
 			if (nested == null) {
 				String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) (%3$s x)))))";
-				definition = String.format(definition, parent.getFuncName(), v.getFuncName(),
+				definition = String.format(definition, parent.getFuncName(), "%s",
 						ValueMapping.getValue(at).getFuncName());
 				definitions.add(definition);
 			} else {
 				String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) (%3$s (%4$s x))))))";
-				definition = String.format(definition, parent.getFuncName(), v.getFuncName(),
+				definition = String.format(definition, parent.getFuncName(), "%s",
 						ValueMapping.getValue(at).getFuncName(), nested);
 				definitions.add(definition);
 			}
@@ -592,12 +592,12 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 			End end = DataModelUtils.getAssociationEnd(as, columnName);
 			if (nested == null) {
 				String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) (%3$s x)))))";
-				definition = String.format(definition, parent.getFuncName(), v.getFuncName(),
+				definition = String.format(definition, parent.getFuncName(), "%s",
 						ValueMapping.getValue(end).getFuncName());
 				definitions.add(definition);
 			} else {
 				String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) (%3$s (%4$s x))))))";
-				definition = String.format(definition, parent.getFuncName(), v.getFuncName(),
+				definition = String.format(definition, parent.getFuncName(), "%s",
 						ValueMapping.getValue(end).getFuncName(), nested);
 				definitions.add(definition);
 			}
@@ -606,12 +606,12 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 			Expression expr = findReferExpression(psi, columnName);
 			if (nested == null) {
 				String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) (%3$s x)))))";
-				definition = String.format(definition, parent.getFuncName(), v.getFuncName(),
+				definition = String.format(definition, parent.getFuncName(), "%s",
 						ValueMapping.getValue(expr).getFuncName());
 				definitions.add(definition);
 			} else {
 				String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) (%3$s (%4$s x))))))";
-				definition = String.format(definition, parent.getFuncName(), v.getFuncName(),
+				definition = String.format(definition, parent.getFuncName(), "%s",
 						ValueMapping.getValue(expr).getFuncName(), nested);
 				definitions.add(definition);
 			}
@@ -676,7 +676,7 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 					TypeUtils.get(expr, IndexMapping.getPlainSelectIndex(ps)));
 			String definition = "(assert (forall ((x Int)) (=> (%1$s x) (= (%2$s x) %3$s))))";
 			String definition2 = "(assert (exists ((x Int)) (and (%1$s x) (= (%2$s x) %3$s))))";
-			definition = String.format(definition, parent.getFuncName(), v.getFuncName(), c.getName());
+			definition = String.format(definition, parent.getFuncName(), "%s", c.getName());
 			definition2 = String.format(definition2, IndexMapping.getPlainSelectIndex(ps).getFuncName(),
 					ValueMapping.getValue(expr).getFuncName(), c.getName());
 			definitions.add(comment);
@@ -715,10 +715,10 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		ExpressionValue v = valueExpression(caseExpression, true);
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) (%4$s x)) (= (%3$s x) TRUE)))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) (%5$s x)) (or (= (%3$s x) FALSE) (= (%3$s x) NULL))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(when).getFuncName(), ValueMapping.getValue(then).getFuncName(),
 				ValueMapping.getValue(elze).getFuncName());
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(when).getFuncName(), ValueMapping.getValue(then).getFuncName(),
 				ValueMapping.getValue(elze).getFuncName());
 		definitions.add(definition1);
@@ -750,9 +750,9 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 			definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (not (exists ((y Int)) (%3$s y)))))))";
 			definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (exists ((y Int)) (%3$s y))))))";
 		}
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				IndexMapping.getPlainSelectIndex(subSelect).getFuncName());
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				IndexMapping.getPlainSelectIndex(subSelect).getFuncName());
 		definitions.add(definition1);
 		definitions.add(definition2);
@@ -787,11 +787,11 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (and (= (%3$s x) TRUE) (= (%4$s x) TRUE))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (or (= (%3$s x) FALSE) (= (%4$s x) FALSE))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (and (= (%3$s x) NULL) (= (%4$s x) TRUE)) (and (= (%3$s x) TRUE) (= (%4$s x) NULL)) (and (= (%3$s x) NULL) (= (%4$s x) NULL)))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
 		definitions.add(definition1);
 		definitions.add(definition2);
@@ -809,11 +809,11 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (or (= (%3$s x) TRUE) (= (%4$s x) TRUE))))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (and (= (%3$s x) FALSE) (= (%4$s x) FALSE))))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (or (and (= (%3$s x) NULL) (= (%4$s x) FALSE)) (and (= (%3$s x) FALSE) (= (%4$s x) NULL)) (and (= (%3$s x) NULL) (= (%4$s x) NULL)))))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(left).getFuncName(), ValueMapping.getValue(right).getFuncName());
 		definitions.add(definition1);
 		definitions.add(definition2);
@@ -955,11 +955,11 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		String definition1 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) TRUE) (= (%3$s x) FALSE)))))";
 		String definition2 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) FALSE) (= (%3$s x) TRUE)))))";
 		String definition3 = "(assert (forall ((x Int)) (=> (%1$s x) (= (= (%2$s x) NULL) (= (%3$s x) NULL)))))";
-		definition1 = String.format(definition1, parent.getFuncName(), v.getFuncName(),
+		definition1 = String.format(definition1, parent.getFuncName(), "%s",
 				ValueMapping.getValue(expr).getFuncName());
-		definition2 = String.format(definition2, parent.getFuncName(), v.getFuncName(),
+		definition2 = String.format(definition2, parent.getFuncName(), "%s",
 				ValueMapping.getValue(expr).getFuncName());
-		definition3 = String.format(definition3, parent.getFuncName(), v.getFuncName(),
+		definition3 = String.format(definition3, parent.getFuncName(), "%s",
 				ValueMapping.getValue(expr).getFuncName());
 		definitions.add(definition1);
 		definitions.add(definition2);

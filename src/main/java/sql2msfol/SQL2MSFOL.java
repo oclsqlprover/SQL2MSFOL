@@ -57,6 +57,12 @@ public class SQL2MSFOL {
 		ValueMapping.reset();
 		StatementValueVisitor vsv = new StatementValueVisitor();
 		sql.accept(vsv);
+		renameResValue();
+	}
+	
+	private void renameResValue() {
+		// This function rename the final Value object (i.e., the single selectitem on the top of our SQL query)
+		ValueMapping.renameResValue();
 	}
 
 	private void generateIndex(Statement sql) {

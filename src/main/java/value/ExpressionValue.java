@@ -3,13 +3,13 @@ package value;
 import java.util.ArrayList;
 import java.util.List;
 
-import index.JoinIndex;
 import net.sf.jsqlparser.expression.Expression;
 
 public class ExpressionValue extends Value {
 	private Expression expr;
 	private List<String> meanings;
 	private boolean isLeft = false;
+	private boolean isRes = false;
 
 	public ExpressionValue() {
 		meanings = new ArrayList<String>();
@@ -39,7 +39,7 @@ public class ExpressionValue extends Value {
 	@Override
 	public void define() {
 		for (String s : meanings) {
-			System.out.println(s);
+			System.out.println(String.format(s, getFuncName()));
 		}
 	}
 
@@ -53,6 +53,16 @@ public class ExpressionValue extends Value {
 
 	@Override
 	public String getFuncName() {
+		if (isRes)
+			return "val-index0-res";
 		return String.format("val-%1$s-expr%2$s", parentIndex.getFuncName(), getName());
+	}
+
+	public boolean isRes() {
+		return isRes;
+	}
+
+	public void setRes(boolean isRes) {
+		this.isRes = isRes;
 	}
 }

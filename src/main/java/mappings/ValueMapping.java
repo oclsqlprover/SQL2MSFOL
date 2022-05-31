@@ -163,4 +163,16 @@ public class ValueMapping {
 		return null;
 	}
 
+	public static void renameResValue() {
+		for (Value v : values) {
+			if (v instanceof ExpressionValue) {
+				ExpressionValue ev = (ExpressionValue) v;
+				if (ev.getFuncName().equals(String.format("val-index0-expr%s", counter-1))) {
+					ev.setRes(true);
+					return;
+				}
+			}
+		}
+	}
+
 }
