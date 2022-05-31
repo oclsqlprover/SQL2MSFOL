@@ -51,13 +51,20 @@ expr := TRUE | FALSE | NULL    (boolean literals)
 - (submodule) [`datamodel`](https://github.com/models22-submission54/dm2schema).
 - The project delegates the SQL text-to-object transformation the [`JSQLParser`](https://github.com/JSQLParser/JSqlParser) library (version 4.2.x).
 
+**Note**: These dependecies are imported in Maven.
+
 The submodules will be updated using `Git` commands as in the guideline.
 
 ### Quick guideline:
 ```
-git clone https://github.com/models22-submission54/dm2schema.git
-git submodule update --init --recursive
+git clone https://github.com/models22-submission54/SQL2MSFOL.git
 ```
+and run the file `scripts.sh` to install the aforementioned packages locally:
+
+```
+.\scripts.sh
+```
+To execute the tool, have a look at the example main class `Runner.java` for a quick guideline.
 
 Have a quick look at the `Runner.java` class for a quick guideline.
 
