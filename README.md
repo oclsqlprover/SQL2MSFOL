@@ -1,5 +1,5 @@
 # SQL2MSFOL
-SQL2MSFOL is an implementation of mapping from SQL statements to Many-Sorted First-Order Logic (MSFOL). This Java implementation based on the mapping definition described in the manuscript [Proving correctness for SQL implementations of OCL constraints]() submitted to MoDELS conference 2022.
+SQL2MSFOL is an implementation of mapping from SQL statements to Many-Sorted First-Order Logic (MSFOL). This Java implementation based on the mapping definition described in the manuscript [Proving correctness for SQL implementations of OCL constraints]().
 
 In a nutshell, given a datamodel, SQL2MSFOL maps an SQL statement into a complete FOL formulae written in [SMT-LIB2](https://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2021-05-12.pdf) language.
 
@@ -48,7 +48,7 @@ expr := TRUE | FALSE | NULL    (boolean literals)
 
 ### Requirements:
 - (required) `Maven 3` and `Java 1.8` (or higher).
-- (submodule) [`datamodel`](https://github.com/models22-submission54/dm2schema).
+- (submodule) [`datamodel`](https://github.com/oclsqlprover/dm2schema).
 - The project delegates the SQL text-to-object transformation the [`JSQLParser`](https://github.com/JSQLParser/JSqlParser) library (version 4.2.x).
 
 **Note**: These dependecies are imported in Maven.
@@ -57,7 +57,7 @@ The submodules will be updated using `Git` commands as in the guideline.
 
 ### Quick guideline:
 ```
-git clone https://github.com/models22-submission54/SQL2MSFOL.git
+git clone https://github.com/oclsqlprover/SQL2MSFOL.git
 ```
 and run the file `scripts.sh` to install the aforementioned packages locally:
 
