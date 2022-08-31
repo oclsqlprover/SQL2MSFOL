@@ -10,6 +10,8 @@ public class ExpressionValue extends Value {
 	private List<String> meanings;
 	private boolean isLeft = false;
 	private boolean isRes = false;
+	private boolean isGrouped = false;
+	private String groupbyFuncname = null;
 
 	public ExpressionValue() {
 		meanings = new ArrayList<String>();
@@ -64,5 +66,21 @@ public class ExpressionValue extends Value {
 
 	public void setRes(boolean isRes) {
 		this.isRes = isRes;
+	}
+
+	public boolean isGrouped() {
+		return isGrouped;
+	}
+
+	public void setGrouped(boolean isGrouped) {
+		this.isGrouped = isGrouped;
+	}
+
+	public String getGroupbyFuncname() {
+		return groupbyFuncname;
+	}
+
+	public void setGroupbyFuncname(String groupbyFuncname) {
+		this.groupbyFuncname = groupbyFuncname;
 	}
 }

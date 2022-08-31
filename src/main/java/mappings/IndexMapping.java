@@ -17,6 +17,7 @@ import index.PlainSelectIndex;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class IndexMapping {
@@ -24,11 +25,15 @@ public class IndexMapping {
 	private static Integer counter;
 	private static List<Index> indices;
 	private static HashMap<String, Index> aliases;
+	private static HashMap<Index, Select> links;
+	private static HashMap<Index, String> groupByFuncNames;
 
 	public static void reset() {
 		IndexMapping.counter = 0;
 		IndexMapping.indices = new ArrayList<Index>();
 		IndexMapping.aliases = new HashMap<String, Index>();
+		IndexMapping.links = new HashMap<Index, Select>();
+		IndexMapping.groupByFuncNames = new HashMap<Index, String>();
 		indexDatamodel();
 	}
 	
@@ -146,6 +151,26 @@ public class IndexMapping {
 
 	public static void link(String alias, Index i) {
 		aliases.put(alias, i);
+	}
+
+	public static void link(Index original, Select appendum) {
+		links.put(original, appendum);
+	}
+
+	public static Index getLinkingIndex(Index original) {
+		return IndexMapping.getPlainSelectIndex((PlainSelect) IndexMapping.links.get(original).getSelectBody());
+	}
+
+	public static Select getAppendumFromIndex(Index plainSelectIndex) {
+		return IndexMapping.links.get(plainSelectIndex);
+	}
+
+	public static void mapGroupByFuncName(Index original, String groupByFunctionName) {
+		groupByFuncNames.put(original, groupByFunctionName);
+	}
+
+	public static String getGroupByFuncName(Index source) {
+		return groupByFuncNames.get(source);
 	}
 
 }

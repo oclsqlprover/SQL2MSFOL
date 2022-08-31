@@ -2,6 +2,7 @@ package visitor;
 
 import java.util.List;
 
+import constant.ConstantMapping;
 import index.Index;
 import index.JoinIndex;
 import index.PlainSelectIndex;
@@ -206,36 +207,64 @@ public class StatementIndexVisitor implements StatementVisitor {
 		indexPlainSelect(ps);
 		// If there is no join
 		try {
-			if (StatementUtils.noFromClause(select)) {}
-			else {
-				FromItem fi = ps.getFromItem();
-				indexFromItem(fi);
-				if (StatementUtils.noWhereClause(select)) {}
-				else {
-					Expression where = ps.getWhere();
-					indexExpression(where);
-				}
-			}
-			if (StatementUtils.noJoinClause(select)) {} 
-			else {
-				FromItem left = ps.getFromItem();
-				FromItem right = ps.getJoins().get(0).getRightItem();
-				indexFromItem(right);
-				indexJoin(left, right);
-				if (StatementUtils.noOnClause(select)) {}
-				else {
-					Expression on = ps.getJoins().get(0).getOnExpression();
-					indexExpression(on);
-				}
-			}
+			if (StatementUtils.noGroupByClause(select)) {
+				noGroupByMapping(select, ps);
+			} else {
+				GroupByMapping(select,ps);
+			}	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		selectItemsMapping(ps);
+	}
+
+	private void GroupByMapping(Select select, PlainSelect ps) {
+		Select flat_b = StatementUtils.constructNewQueryWithoutGroupBy(select);
+		flat_b.accept(this);
+		IndexMapping.link(IndexMapping.getPlainSelectIndex(ps), flat_b);
+		final String groupByFunctionName = "groupby%d".formatted(ConstantMapping.getCounter());
+		IndexMapping.mapGroupByFuncName(IndexMapping.getPlainSelectIndex(ps), groupByFunctionName);
+	}
+
+	private void selectItemsMapping(PlainSelect ps) {
 		List<SelectItem> sis = ps.getSelectItems();
 		for (SelectItem si : sis) {
 			SelectExpressionItem sei = (SelectExpressionItem) si;
 			Expression expr = sei.getExpression();
 			indexExpression(expr);
+		}
+	}
+
+	private void noGroupByMapping(Select select, PlainSelect ps) throws Exception {
+		if (StatementUtils.noFromClause(select)) {}
+		else {
+			fromMapping(select, ps);
+		}
+		if (StatementUtils.noJoinClause(select)) {} 
+		else {
+			joinMapping(select, ps);
+		}
+	}
+
+	private void joinMapping(Select select, PlainSelect ps) throws Exception {
+		FromItem left = ps.getFromItem();
+		FromItem right = ps.getJoins().get(0).getRightItem();
+		indexFromItem(right);
+		indexJoin(left, right);
+		if (StatementUtils.noOnClause(select)) {}
+		else {
+			Expression on = ps.getJoins().get(0).getOnExpression();
+			indexExpression(on);
+		}
+	}
+
+	private void fromMapping(Select select, PlainSelect ps) throws Exception {
+		FromItem fi = ps.getFromItem();
+		indexFromItem(fi);
+		if (StatementUtils.noWhereClause(select)) {}
+		else {
+			Expression where = ps.getWhere();
+			indexExpression(where);
 		}
 	}
 

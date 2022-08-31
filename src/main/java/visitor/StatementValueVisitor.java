@@ -201,75 +201,130 @@ public class StatementValueVisitor implements StatementVisitor {
 		// The only Statement that we care is Select statement
 		PlainSelect ps = (PlainSelect) select.getSelectBody();
 		try {
-			if (StatementUtils.noFromClause(select)) {
-				// ONLY SELECT
-				List<SelectItem> sis = ps.getSelectItems();
-				for (SelectItem si : sis) {
-					SelectExpressionItem sei = (SelectExpressionItem) si;
-					Expression expr = sei.getExpression();
-					Index i = IndexMapping.getPlainSelectIndex(ps);
-					valExpression(expr, null, i);
+			if (StatementUtils.noGroupByClause(select)) {
+				if (StatementUtils.noFromClause(select)) {
+					onlySelect(ps);
 				}
-			}
-			else {
-				FromItem fi = ps.getFromItem();
-				valFromItem(fi);
-				if (StatementUtils.noJoinClause(select)) {
-					if (StatementUtils.noWhereClause(select)) {
-						// SELECT FROM
-						List<SelectItem> sis = ps.getSelectItems();
-						for (SelectItem si : sis) {
-							SelectExpressionItem sei = (SelectExpressionItem) si;
-							Expression expr = sei.getExpression();
-							Index parent = IndexMapping.getPlainSelectIndex(ps);
-							Index source = IndexMapping.find(fi);
-							valExpression(expr, source, parent);
-						}
-					}
-					else {
-						// SELECT FROM WHERE
-						Expression where = ps.getWhere();
-						Index source = IndexMapping.find(fi);
-						valExpression(where, source, source);
-						List<SelectItem> sis = ps.getSelectItems();
-						for (SelectItem si : sis) {
-							SelectExpressionItem sei = (SelectExpressionItem) si;
-							Expression expr = sei.getExpression();
-							Index parent = IndexMapping.getPlainSelectIndex(ps);
-							valExpression(expr, source, parent);
-						}
-					}
-				} 
 				else {
-					FromItem left = ps.getFromItem();
-					FromItem right = ps.getJoins().get(0).getRightItem();
-					valFromItem(right);
-					if (StatementUtils.noWhereClause(select)) {
-					}
-					else {
-						// SELECT FROM JOIN + WHERE
-						Expression where = ps.getWhere();
-						Index i = IndexMapping.getJoinIndex(IndexMapping.find(left), IndexMapping.find(right));
-						valExpression(where, i, i);
-					}
-					if (StatementUtils.noOnClause(select)) {}
-					else {
-						Expression on = ps.getJoins().get(0).getOnExpression();
-						Index i = IndexMapping.getJoinIndex(IndexMapping.find(left), IndexMapping.find(right));
-						valExpression(on, i, i);
-					}
-					List<SelectItem> sis = ps.getSelectItems();
-					for (SelectItem si : sis) {
-						SelectExpressionItem sei = (SelectExpressionItem) si;
-						Expression expr = sei.getExpression();
-						Index parent = IndexMapping.getPlainSelectIndex(ps);
-						Index source = IndexMapping.getJoinIndex(IndexMapping.find(left), IndexMapping.find(right));
-						valExpression(expr, source, parent);
-					}
+					withFrom(select, ps);
 				}
+			} else {
+				Select appendum = IndexMapping.getAppendumFromIndex(IndexMapping.getPlainSelectIndex(ps));
+				appendum.accept(this);
+				withGroupBy_selectItems(ps, IndexMapping.getPlainSelectIndex((PlainSelect) appendum.getSelectBody()), IndexMapping.getPlainSelectIndex(ps));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void withGroupBy_selectItems(PlainSelect ps, Index source, Index parent) {
+		List<SelectItem> sis = ps.getSelectItems();
+		for (SelectItem si : sis) {
+			SelectExpressionItem sei = (SelectExpressionItem) si;
+			Expression expr = sei.getExpression();
+			valExpression(expr, source, parent, IndexMapping.getGroupByFuncName(parent));
+		}
+	}
+
+	private void withFrom(Select select, PlainSelect ps) throws Exception {
+		FromItem fi = ps.getFromItem();
+		valFromItem(fi);
+		if (StatementUtils.noJoinClause(select)) {
+			noJoin(select, ps, fi);
+		} 
+		else {
+			withJoin(select, ps);
+		}
+	}
+
+	private void withJoin(Select select, PlainSelect ps) throws Exception {
+		FromItem left = ps.getFromItem();
+		FromItem right = ps.getJoins().get(0).getRightItem();
+		valFromItem(right);
+		if (StatementUtils.noWhereClause(select)) {
+		}
+		else {
+			withJoin_withWhere(ps, left, right);
+		}
+		if (StatementUtils.noOnClause(select)) {}
+		else {
+			withJoin_withOn(ps, left, right);
+		}
+		withJoin_selectItems(ps, left, right);
+	}
+
+	private void withJoin_selectItems(PlainSelect ps, FromItem left, FromItem right) {
+		List<SelectItem> sis = ps.getSelectItems();
+		for (SelectItem si : sis) {
+			SelectExpressionItem sei = (SelectExpressionItem) si;
+			Expression expr = sei.getExpression();
+			Index parent = IndexMapping.getPlainSelectIndex(ps);
+			Index source = IndexMapping.getJoinIndex(IndexMapping.find(left), IndexMapping.find(right));
+			valExpression(expr, source, parent);
+		}
+	}
+
+	private void withJoin_withOn(PlainSelect ps, FromItem left, FromItem right) {
+		Expression on = ps.getJoins().get(0).getOnExpression();
+		Index i = IndexMapping.getJoinIndex(IndexMapping.find(left), IndexMapping.find(right));
+		valExpression(on, i, i);
+	}
+
+	private void withJoin_withWhere(PlainSelect ps, FromItem left, FromItem right) {
+		// SELECT FROM JOIN + WHERE
+		Expression where = ps.getWhere();
+		Index i = IndexMapping.getJoinIndex(IndexMapping.find(left), IndexMapping.find(right));
+		valExpression(where, i, i);
+	}
+
+	private void noJoin(Select select, PlainSelect ps, FromItem fi) throws Exception {
+		if (StatementUtils.noWhereClause(select)) {
+			noJoin_noWhere(ps, fi);
+		}
+		else {
+			noJoin_withWhere(ps, fi);
+		}
+	}
+
+	private void noJoin_withWhere(PlainSelect ps, FromItem fi) {
+		// SELECT FROM WHERE
+		Expression where = ps.getWhere();
+		Index source = IndexMapping.find(fi);
+		valExpression(where, source, source);
+		noJoin_selectItems(ps, source);
+	}
+
+	private void noJoin_selectItems(PlainSelect ps, Index source) {
+		List<SelectItem> sis = ps.getSelectItems();
+		for (SelectItem si : sis) {
+			SelectExpressionItem sei = (SelectExpressionItem) si;
+			Expression expr = sei.getExpression();
+			Index parent = IndexMapping.getPlainSelectIndex(ps);
+			valExpression(expr, source, parent);
+		}
+	}
+
+	private void noJoin_noWhere(PlainSelect ps, FromItem fi) {
+		// SELECT FROM
+		List<SelectItem> sis = ps.getSelectItems();
+		for (SelectItem si : sis) {
+			SelectExpressionItem sei = (SelectExpressionItem) si;
+			Expression expr = sei.getExpression();
+			Index parent = IndexMapping.getPlainSelectIndex(ps);
+			Index source = IndexMapping.find(fi);
+			valExpression(expr, source, parent);
+		}
+	}
+
+	private void onlySelect(PlainSelect ps) {
+		// ONLY SELECT
+		List<SelectItem> sis = ps.getSelectItems();
+		for (SelectItem si : sis) {
+			SelectExpressionItem sei = (SelectExpressionItem) si;
+			Expression expr = sei.getExpression();
+			Index i = IndexMapping.getPlainSelectIndex(ps);
+			valExpression(expr, null, i);
 		}
 	}
 
@@ -289,6 +344,15 @@ public class StatementValueVisitor implements StatementVisitor {
 		ExpressionValueVisitor vev = new ExpressionValueVisitor();
 		vev.setSource(source);
 		vev.setParent(parent);
+		expr.accept(vev);
+	}
+	
+	private void valExpression(Expression expr, Index source, Index parent, String groupByFuncName) {
+		ExpressionValueVisitor vev = new ExpressionValueVisitor();
+		vev.setSource(source);
+		vev.setParent(parent);
+		vev.setGrouped(true);
+		vev.setGroupByFuncname(groupByFuncName);
 		expr.accept(vev);
 	}
 
