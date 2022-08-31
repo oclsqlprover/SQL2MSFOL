@@ -207,23 +207,53 @@ public class StatementIndexVisitor implements StatementVisitor {
 		indexPlainSelect(ps);
 		// If there is no join
 		try {
-			if (StatementUtils.noGroupByClause(select)) {
+			if (StatementUtils.noGroupByClause(select) && StatementUtils.noAggregation(select)) {
 				noGroupByMapping(select, ps);
+				selectItemsMapping(ps);
 			} else {
 				GroupByMapping(select,ps);
+				selectItemsMapping_withGroupBy(ps);
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		selectItemsMapping(ps);
+		
 	}
 
-	private void GroupByMapping(Select select, PlainSelect ps) {
-		Select flat_b = StatementUtils.constructNewQueryWithoutGroupBy(select);
-		flat_b.accept(this);
-		IndexMapping.link(IndexMapping.getPlainSelectIndex(ps), flat_b);
-		final String groupByFunctionName = "groupby%d".formatted(ConstantMapping.getCounter());
-		IndexMapping.mapGroupByFuncName(IndexMapping.getPlainSelectIndex(ps), groupByFunctionName);
+	private void selectItemsMapping_withGroupBy(PlainSelect ps) {
+		List<SelectItem> sis = ps.getSelectItems();
+		for (SelectItem si : sis) {
+			SelectExpressionItem sei = (SelectExpressionItem) si;
+			Expression expr = sei.getExpression();
+			indexExpression_withGroupBy(expr);
+		}
+	}
+
+	private void indexExpression_withGroupBy(Expression expr) {
+		ExpressionIndexVisitor iev = new ExpressionIndexVisitor();
+		iev.setGrouped(true);
+		expr.accept(iev);
+	}
+
+	private void GroupByMapping(Select select, PlainSelect ps) throws Exception {
+		Select flat_b = null;
+		if (StatementUtils.noGroupByClause(select)) {
+			flat_b = StatementUtils.constructNewQueryWithoutCount(select);
+			flat_b.accept(this);
+			IndexMapping.link(IndexMapping.getPlainSelectIndex(ps), flat_b);
+			final String countConstant = "count%d".formatted(ConstantMapping.getCountCounter());
+			IndexMapping.mapCountConstant(IndexMapping.getPlainSelectIndex(ps), countConstant);
+		} else {
+			flat_b = StatementUtils.constructNewQueryWithoutCountAndGroupBy(select);
+			flat_b.accept(this);
+			IndexMapping.link(IndexMapping.getPlainSelectIndex(ps), flat_b);
+			final String groupByFunctionName = "groupby%d".formatted(ConstantMapping.getCounter());
+			IndexMapping.mapGroupByFuncName(IndexMapping.getPlainSelectIndex(ps), groupByFunctionName);
+			if (!StatementUtils.noAggregation(select)) {
+				final String countConstant = "count%d".formatted(ConstantMapping.getCountCounter());
+				IndexMapping.mapCountConstant(IndexMapping.getPlainSelectIndex(ps), countConstant);
+			}
+		}
 	}
 
 	private void selectItemsMapping(PlainSelect ps) {

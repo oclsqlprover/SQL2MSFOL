@@ -27,6 +27,7 @@ public class IndexMapping {
 	private static HashMap<String, Index> aliases;
 	private static HashMap<Index, Select> links;
 	private static HashMap<Index, String> groupByFuncNames;
+	private static HashMap<Index, String> countConstants;
 
 	public static void reset() {
 		IndexMapping.counter = 0;
@@ -34,6 +35,7 @@ public class IndexMapping {
 		IndexMapping.aliases = new HashMap<String, Index>();
 		IndexMapping.links = new HashMap<Index, Select>();
 		IndexMapping.groupByFuncNames = new HashMap<Index, String>();
+		IndexMapping.countConstants = new HashMap<Index, String>();
 		indexDatamodel();
 	}
 	
@@ -171,6 +173,14 @@ public class IndexMapping {
 
 	public static String getGroupByFuncName(Index source) {
 		return groupByFuncNames.get(source);
+	}
+	
+	public static void mapCountConstant(Index original, String constant) {
+		countConstants.put(original, constant);
+	}
+
+	public static String getCountConstant(Index source) {
+		return countConstants.get(source);
 	}
 
 }

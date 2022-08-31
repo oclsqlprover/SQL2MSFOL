@@ -85,6 +85,8 @@ import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class ExpressionIndexVisitor implements ExpressionVisitor {
+	
+	private boolean isGrouped = false;
 
 	@Override
 	public void visit(BitwiseRightShift aThis) {
@@ -107,8 +109,12 @@ public class ExpressionIndexVisitor implements ExpressionVisitor {
 	@Override
 	public void visit(Function function) {
 		// Currently, we accept one parameter in the function (i.e., function as aggregation)
-		Expression expr = function.getParameters().getExpressions().get(0);
-		expr.accept(this);
+		if ("COUNT".equals(function.getName())) {
+			// DO nothing
+		} else {
+			Expression expr = function.getParameters().getExpressions().get(0);
+			expr.accept(this);
+		}
 	}
 
 	@Override
@@ -586,6 +592,14 @@ public class ExpressionIndexVisitor implements ExpressionVisitor {
 	public void visit(OracleNamedFunctionParameter aThis) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public boolean isGrouped() {
+		return isGrouped;
+	}
+
+	public void setGrouped(boolean isGrouped) {
+		this.isGrouped = isGrouped;
 	}
 
 }

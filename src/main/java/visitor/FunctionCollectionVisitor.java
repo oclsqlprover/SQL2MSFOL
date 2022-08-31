@@ -1,14 +1,8 @@
 package visitor;
 
-import configurations.Context;
-import datamodel.DataModelUtils;
-import index.AssociationIndex;
-import index.EntityIndex;
-import index.Index;
-import index.JoinIndex;
-import index.PlainSelectIndex;
-import mappings.IndexMapping;
-import mappings.ValueMapping;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
 import net.sf.jsqlparser.expression.ArrayConstructor;
@@ -89,16 +83,21 @@ import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
 import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
 import net.sf.jsqlparser.expression.operators.relational.SimilarToExpression;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.select.SubSelect;
-import type.TypeUtils;
-import value.Value;
 
-public class ExpressionTypeVisitor implements ExpressionVisitor {
+public class FunctionCollectionVisitor implements ExpressionVisitor {
 
-	private String type;
-	private Index source;
+	private List<Function> functions = new ArrayList<Function>();
+
+	public List<Function> getFunctions() {
+		return functions;
+	}
+
+	public void setFunctions(List<Function> functions) {
+		this.functions = functions;
+	}
 
 	@Override
 	public void visit(BitwiseRightShift aThis) {
@@ -114,24 +113,19 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(NullValue nullValue) {
-		// TODO: Boolean for now!
-		this.type = "BOOL";
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void visit(Function function) {
-		if ("COUNT".equals(function.getName())) {
-			this.type = "Int";
-		} else {
-			Expression expr = function.getParameters().getExpressions().get(0);
-			expr.accept(this);
-		}
+		functions.add(function);
 	}
 
 	@Override
 	public void visit(SignedExpression signedExpression) {
-		Expression expr = signedExpression.getExpression();
-		expr.accept(this);
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -154,7 +148,8 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(LongValue longValue) {
-		this.type = "Int";
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -189,7 +184,8 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(StringValue stringValue) {
-		this.type = "String";
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -224,12 +220,18 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(AndExpression andExpression) {
-		this.type = "BOOL";
+		Expression left = andExpression.getLeftExpression();
+		left.accept(this);
+		Expression right = andExpression.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
 	public void visit(OrExpression orExpression) {
-		this.type = "BOOL";
+		Expression left = orExpression.getLeftExpression();
+		left.accept(this);
+		Expression right = orExpression.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
@@ -246,17 +248,26 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(EqualsTo equalsTo) {
-		this.type = "BOOL";
+		Expression left = equalsTo.getLeftExpression();
+		left.accept(this);
+		Expression right = equalsTo.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
 	public void visit(GreaterThan greaterThan) {
-		this.type = "BOOL";
+		Expression left = greaterThan.getLeftExpression();
+		left.accept(this);
+		Expression right = greaterThan.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
 	public void visit(GreaterThanEquals greaterThanEquals) {
-		this.type = "BOOL";
+		Expression left = greaterThanEquals.getLeftExpression();
+		left.accept(this);
+		Expression right = greaterThanEquals.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
@@ -273,7 +284,8 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(IsNullExpression isNullExpression) {
-		this.type = "BOOL";
+		Expression expr = isNullExpression.getLeftExpression();
+		expr.accept(this);
 	}
 
 	@Override
@@ -290,107 +302,51 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(MinorThan minorThan) {
-		this.type = "BOOL";
+		Expression left = minorThan.getLeftExpression();
+		left.accept(this);
+		Expression right = minorThan.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
 	public void visit(MinorThanEquals minorThanEquals) {
-		this.type = "BOOL";
+		Expression left = minorThanEquals.getLeftExpression();
+		left.accept(this);
+		Expression right = minorThanEquals.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
 	public void visit(NotEqualsTo notEqualsTo) {
-		this.type = "BOOL";
+		Expression left = notEqualsTo.getLeftExpression();
+		left.accept(this);
+		Expression right = notEqualsTo.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
 	public void visit(Column tableColumn) {
-		String columnName = tableColumn.getColumnName();
-		if ("TRUE".equalsIgnoreCase(columnName)) {
-			this.type = "BOOL";
-			return;
-		}
-		if ("FALSE".equalsIgnoreCase(columnName)) {
-			this.type = "BOOL";
-			return;
-		}
-		if (DataModelUtils.matchContext(tableColumn)) {
-			Context ctx = DataModelUtils.get(tableColumn);
-			this.type = TypeUtils.convert(ctx.getType());
-			return;
-		}
-		{
-			if (source instanceof EntityIndex) {
-				EntityIndex ei = (EntityIndex) source;
-				String type = DataModelUtils.getType(columnName, ei.getSource());
-				this.type = TypeUtils.convert(type);
-			} else if (source instanceof AssociationIndex) {
-				this.type = "Classifier";
-			} else if (source instanceof PlainSelectIndex) {
-//				PlainSelectIndex psi = (PlainSelectIndex) source;
-//				PlainSelect ps = psi.getSource();
-//				FromItem fi = ps.getFromItem();
-//				Index ifi = IndexMapping.find(fi);
-//				this.type = findTypeFromSourceIndex(columnName, ifi);
-				// Must be another subselect
-				PlainSelectIndex psi_ = (PlainSelectIndex) source;
-				Value referenceValue = ValueMapping.getValue(psi_, columnName);
-				String type = referenceValue.getType().getName();
-				this.type = TypeUtils.convert(type);
-			} else {
-				// Must be a JoinIndex
-				JoinIndex ji = (JoinIndex) source;
-				Index left = ji.getLeft();
-				Index right = ji.getRight();
-				if (findTypeFromSourceIndex(columnName, left) == null) {
-					this.type = findTypeFromSourceIndex(columnName, right);
-				} else {
-					this.type = findTypeFromSourceIndex(columnName, left);
-				}
-			}
-		}
-	}
+		// TODO Auto-generated method stub
 
-	private String findTypeFromSourceIndex(String columnName, Index ifi) {
-		if (ifi instanceof EntityIndex) {
-			EntityIndex ei = (EntityIndex) ifi;
-			String type = DataModelUtils.getType(columnName, ei.getSource());
-			return TypeUtils.convert(type);
-		} else if (ifi instanceof AssociationIndex) {
-			return "Classifier";
-		} else {
-			// Must be another subselect
-			PlainSelectIndex psi_ = (PlainSelectIndex) ifi;
-			Value referenceValue = ValueMapping.getValue(psi_, columnName);
-			if (referenceValue == null) {
-				return null;
-			}
-			String type = referenceValue.getType().getName();
-			return TypeUtils.convert(type);
-		}
 	}
 
 	@Override
 	public void visit(SubSelect subSelect) {
-		PlainSelect ps = (PlainSelect) subSelect.getSelectBody();
-		SelectExpressionItem sei = (SelectExpressionItem) ps.getSelectItems().get(0);
-		ExpressionTypeVisitor etv = new ExpressionTypeVisitor();
-		etv.setSource(IndexMapping.getPlainSelectIndex(ps));
-		sei.getExpression().accept(etv);
-		this.type = etv.getType();
+		SelectBody sb = subSelect.getSelectBody();
+		Select s = new Select();
+		s.setSelectBody(sb);
+		StatementIndexVisitor isv = new StatementIndexVisitor();
+		s.accept(isv);
 	}
 
 	@Override
 	public void visit(CaseExpression caseExpression) {
-		Expression elze = caseExpression.getElseExpression();
+		Expression when = caseExpression.getWhenClauses().get(0).getWhenExpression();
+		when.accept(this);
 		Expression then = caseExpression.getWhenClauses().get(0).getThenExpression();
-		elze.accept(this);
-		String elzeType = this.getType();
 		then.accept(this);
-		String thenType = this.getType();
-		if (elzeType != thenType) {
-			System.out.println("Type mismatch in the Case expression");
-		}
+		Expression elze = caseExpression.getElseExpression();
+		elze.accept(this);
 	}
 
 	@Override
@@ -401,7 +357,8 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(ExistsExpression existsExpression) {
-		this.type = "BOOL";
+		Expression expr = existsExpression.getRightExpression();
+		expr.accept(this);
 	}
 
 	@Override
@@ -424,12 +381,18 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(BitwiseAnd bitwiseAnd) {
-		this.type = "BOOL";
+		Expression left = bitwiseAnd.getLeftExpression();
+		left.accept(this);
+		Expression right = bitwiseAnd.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
 	public void visit(BitwiseOr bitwiseOr) {
-		this.type = "BOOL";
+		Expression left = bitwiseOr.getLeftExpression();
+		left.accept(this);
+		Expression right = bitwiseOr.getRightExpression();
+		right.accept(this);
 	}
 
 	@Override
@@ -560,7 +523,8 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(NotExpression aThis) {
-		this.type = "BOOL";
+		Expression expr = aThis.getExpression();
+		expr.accept(this);
 	}
 
 	@Override
@@ -633,17 +597,5 @@ public class ExpressionTypeVisitor implements ExpressionVisitor {
 	public void visit(OracleNamedFunctionParameter aThis) {
 		// TODO Auto-generated method stub
 
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public Index getSource() {
-		return source;
-	}
-
-	public void setSource(Index source) {
-		this.source = source;
 	}
 }

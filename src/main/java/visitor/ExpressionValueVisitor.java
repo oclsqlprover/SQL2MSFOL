@@ -175,8 +175,9 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visit(Function function) {
-		// TODO Auto-generated method stub
-
+		if ("COUNT".equals(function.getName())) {
+			ExpressionValue v = valueExpression(function, true);
+		}
 	}
 
 	private ExpressionValue valueExpression(Expression expr, Boolean forNow) {
@@ -586,7 +587,7 @@ public class ExpressionValueVisitor implements ExpressionVisitor {
 		} else {
 			// It must be the projection from Fromitem(s)
 			mapFromItemColumn(tableColumn, columnName, v, source, v.isGrouped() ? groupByFuncname : null);
-		} 
+		}
 		v.setMeanings(definitions);
 	}
 

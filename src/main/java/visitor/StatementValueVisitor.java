@@ -201,7 +201,7 @@ public class StatementValueVisitor implements StatementVisitor {
 		// The only Statement that we care is Select statement
 		PlainSelect ps = (PlainSelect) select.getSelectBody();
 		try {
-			if (StatementUtils.noGroupByClause(select)) {
+			if (StatementUtils.noGroupByClause(select) && StatementUtils.noAggregation(select)) {
 				if (StatementUtils.noFromClause(select)) {
 					onlySelect(ps);
 				}
@@ -211,7 +211,12 @@ public class StatementValueVisitor implements StatementVisitor {
 			} else {
 				Select appendum = IndexMapping.getAppendumFromIndex(IndexMapping.getPlainSelectIndex(ps));
 				appendum.accept(this);
-				withGroupBy_selectItems(ps, IndexMapping.getPlainSelectIndex((PlainSelect) appendum.getSelectBody()), IndexMapping.getPlainSelectIndex(ps));
+				if (StatementUtils.noGroupByClause(select)) {
+					withCount_selectItems(ps, IndexMapping.getPlainSelectIndex((PlainSelect) appendum.getSelectBody()), IndexMapping.getPlainSelectIndex(ps));
+				} else {
+					withGroupBy_selectItems(ps, IndexMapping.getPlainSelectIndex((PlainSelect) appendum.getSelectBody()), IndexMapping.getPlainSelectIndex(ps));
+				}
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -224,6 +229,15 @@ public class StatementValueVisitor implements StatementVisitor {
 			SelectExpressionItem sei = (SelectExpressionItem) si;
 			Expression expr = sei.getExpression();
 			valExpression(expr, source, parent, IndexMapping.getGroupByFuncName(parent));
+		}
+	}
+	
+	private void withCount_selectItems(PlainSelect ps, Index source, Index parent) {
+		List<SelectItem> sis = ps.getSelectItems();
+		for (SelectItem si : sis) {
+			SelectExpressionItem sei = (SelectExpressionItem) si;
+			Expression expr = sei.getExpression();
+			valExpression(expr, source, parent);
 		}
 	}
 

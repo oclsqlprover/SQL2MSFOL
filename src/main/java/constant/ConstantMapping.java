@@ -7,10 +7,12 @@ import type.Type;
 
 public class ConstantMapping {
 	private static Integer counter;
+	private static Integer countCounter;
 	private static HashMap<SubSelect, Constant> constants;
 	
 	public static void reset() {
 		ConstantMapping.counter = 0;
+		ConstantMapping.countCounter = 0;
 		ConstantMapping.constants = new HashMap<SubSelect, Constant>();
 	}
 
@@ -38,5 +40,13 @@ public class ConstantMapping {
 		ConstantMapping.constants.values().forEach(c -> {
 			c.define();
 		});
+	}
+
+	public static Integer getCountCounter() {
+		return countCounter++;
+	}
+
+	public static void setCountCounter(Integer countCounter) {
+		ConstantMapping.countCounter = countCounter;
 	}
 }
